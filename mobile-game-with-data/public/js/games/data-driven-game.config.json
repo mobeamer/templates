@@ -1,0 +1,63 @@
+{
+    "startingChar": {"life": 5, "startX": 300, "startY": 200}
+    ,"numEnemies": 3
+    ,"spawnPoints": [{"x":200,"y":200}]
+    
+    ,"enemyProfiles": [
+                    {"life":5, "level": 1}
+                    ,{"life":10, "level": 2}                    
+                    ,{"life":30, "level": 3}                      
+    ]
+
+    ,"assets": [
+                {    "key": "dirt-tile-sheet"
+                    ,"width":96
+                    ,"height": 192
+                    ,"imgSrc": "img/tiles/dirt.png"
+                }
+                ,{   "key": "lava-tile-sheet"
+                    ,"width":96
+                    ,"height": 192
+                    ,"imgSrc": "img/tiles/lava.png"
+                }
+
+            ]
+       
+    ,"tileMaps": [
+        {
+              "tileMapName": "dirt-5x5"
+            , "assetKey": "dirt-tile-sheet"
+            , "tileSize": 32
+            , "isWalkable" : true
+            , "tileMap": [
+                             [6,9 ,9 ,9 ,12 ]
+                            ,[7,10,10,10,13]
+                            ,[7,10,10,10,13]
+                            ,[7,10,10,10,13]
+                            ,[8,11,11,11,14 ]
+                        ]
+        }
+
+
+        ,{
+            "tileMapName": "lava-5x5"
+          , "assetKey": "lava-tile-sheet"
+          , "tileSize": 32
+          , "isWalkable" : false
+          , "tileMap": [
+                           [6,9 ,9 ,9 ,12 ]
+                          ,[7,10,10,10,13]
+                          ,[7,10,10,10,13]
+                          ,[7,10,10,10,13]
+                          ,[8,11,11,11,14 ]
+                      ]
+      }
+    ]
+
+
+    ,"build": [
+                {"buildType": "tileMap", "x": 300, "y": 100, "tileMapName": "dirt-5x5"}
+                ,{"buildType": "tileMap", "x": 300, "y": -64, "tileMapName": "lava-5x5"}
+                ,{"buildType": "random", "minX": 300, "maxX":1000, "minY": 300, "maxY":1000, "numDirt": 3, "numLava": 3}
+        ]
+}

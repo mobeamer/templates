@@ -8,6 +8,8 @@ function Game(options)
     this.mapID = -1;
     this.playing = true;
     this.refreshRate = 2000;
+    this.jumpToView = false;
+    this.panOnClick = false;
 
     this.joinedServer = function()
     {
@@ -26,6 +28,13 @@ function Game(options)
 
         gui.showView("viewGameCanvas");
 
+        gameEngine.setMiniMapLocation(window.innerWidth - 120, 20);
+        //gameEngine.setMiniMapLocation(0,0);
+        gameEngine.setView(100,10);
+
+        assets.addAsset({key: 'dirt-tile-sheet',width:96, height: 192, imgSrc: 'img/tiles/dirt.png'});
+        assets.addAsset({key: 'lava-tile-sheet',width:96, height: 192, imgSrc: 'img/tiles/lava.png'});
+       
 
         //this.loadWalkingSamples();
 
@@ -39,9 +48,120 @@ function Game(options)
 
         //this.loadCollisionSample2();
 
+        //this.loadFightSample();
+
+        //this.loadPanningTest();
+
+        //this.loadMiniMapTest();
+
+        this.loadGameSample();
     }
 
+
+
+    this.loadGameSample = function()
+    {
+        gameEngine.setView(0,0);
+        
+        this.addFriendly(50,50);
+        this.addEnemy(50,150);
+
+        this.addSmallDirtPile(10,10);
+        this.addSmallLavaLake(300,10);
+        
+        gameEngine.setViewToEntity(0);
+
+        for(var i=0;i<5;i++)
+        {
+            var x = gameEngine.getRandomNumber(10,2000);
+            var y = gameEngine.getRandomNumber(10,2000);
+            this.addSmallDirtPile(x,y);
+        }
+
+        for(var i=0;i<5;i++)
+        {
+            var x = gameEngine.getRandomNumber(10,2000);
+            var y = gameEngine.getRandomNumber(10,2000);
+            this.addSmallLavaLake(x,y);
+        }
+           
+    }
+
+
+
+    this.loadMiniMapTest = function()
+    {
+        this.addFriendly(150,150);
+        
+        this.addEnemy(0,0);
+
+        for(var i=0;i< 20;i++)
+        {
+            this.addEnemy(gameEngine.getRandomNumber(10,2000),gameEngine.getRandomNumber(10,2000));
+        }
+
+        gameEngine.setView(0,0);
+        
+    }
+
+
+    this.loadPanningTest = function()
+    {
+        this.addFriendly(100,100);
+        
+        this.addEnemy(10,10);
+
+        this.panOnClick = true;
+        
+        //gameEngine.panToView(100,100);
+    }
     
+    this.loadFightSample = function()
+    {
+        gameEngine.addEntity(new GameEntity({
+                            entityID: 1
+                            ,ownerID: 1
+                            ,pos: new Position({x:100,y:100})
+                            ,width: 32
+                            ,height: 32
+                            ,speed: 1 
+                            ,velX: 0
+                            ,velY: 0
+                            ,life: 3
+                        }));
+
+                    
+        gameEngine.addEntity(new GameEntity({
+                            entityID: 3
+                            ,ownerID: 1
+                            ,pos: new Position({x:200,y:50})
+                            ,width: 32
+                            ,height: 32
+                            ,speed: 1 
+                            ,velX: 0
+                            ,velY: 0
+                            ,life:100
+                        }));    
+
+        //controlling
+        gameEngine.addEntity(new GameEntity({
+                            entityID: 2
+                            ,ownerID: user.userID
+                            ,pos: new Position({x:100,y:300})
+                            ,width: 32
+                            ,height: 32
+                            ,speed: 1 
+                            ,velX: 0
+                            ,velY: 0
+                            ,life:100
+                        }));  
+                        
+
+    }
+
+
+
+
     this.loadCollisionSample2 = function()
     {
         assets.addAsset({key: 'dirt-tile-sheet',width:96, height: 192, imgSrc: 'img/tiles/dirt.png'});
@@ -237,6 +357,8 @@ function Game(options)
 
     this.loadWalkingSamples = function()
     {
+        
+
         //walking north
         gameEngine.addEntity(new GameEntity({
                             entityID: 1
@@ -292,643 +414,121 @@ function Game(options)
         
     }
 
+    this.addFriendly = function(x, y)
+    {
+        gameEngine.addEntity(new GameEntity({
+            entityID: gameEngine.entity.length+100
+            ,ownerID: user.userID
+            ,pos: new Position({x:x,y:y})
+            ,width: 32
+            ,height: 32
+            ,speed: 1 
+            ,velX: 0
+            ,velY: 0
+            ,life:1000
+        }));  
+    }
+
+
+    this.addEnemy = function(x, y)
+    {
+        gameEngine.addEntity(new GameEntity({
+            entityID: gameEngine.entity.length+100
+            ,ownerID: -999
+            ,pos: new Position({x:x,y:y})
+            ,width: 32
+            ,height: 32
+            ,speed: 1 
+            ,velX: 0
+            ,velY: 0
+            ,life:1000
+        }));  
+    }
+
+    
+    this.addSmallDirtPile = function(x, y)
+    {
+        
+        var tileMap = [
+            [6,9 ,9 ,9 ,12 ]
+           ,[7,10,10,10,13]
+           ,[7,10,10,10,13]
+           ,[7,10,10,10,13]
+           ,[8,11,11,11,14 ]
+        ];
+
+        gameEngine.loadTileMapAt(x, y, 32,'dirt-tile-sheet',tileMap, true);
+
+    }
+
+    this.addSmallLavaLake = function(x, y)
+    {
+        
+        var tileMap = [
+            [6,9 ,9 ,9 ,12 ]
+           ,[7,10,10,10,13]
+           ,[7,10,10,10,13]
+           ,[7,10,10,10,13]
+           ,[8,11,11,11,14 ]
+        ];
+
+        gameEngine.loadTileMapAt(x, y, 32,'lava-tile-sheet',tileMap, false);
+
+    }
+
+
     this.entityClicked = function(clickedEntityIdx)
     {
+        if(clickedEntityIdx != gameEngine.selectedEntityIdx)
+        {
+            var selected = gameEngine.entity[gameEngine.selectedEntityIdx];
+            var clicked = gameEngine.entity[clickedEntityIdx];
 
+            if(selected.ownerID != clicked.ownerID)
+            {
+                console.log("attacking...");
+                gameEngine.entity[gameEngine.selectedEntityIdx].setTargetEnemyIdx(clickedEntityIdx);
+            }
+        }
     }
 
-    this.mouseMoveEnd  = function(mouseX, mouseY)
+    this.emptySpaceClicked = function(mouseX, mouseY)
     {
-       
-    }
+        /*
+        if(this.jumpToView)
+        {
+            gameEngine.setView(mouseX + window.innerWidth/2, mouseY - window.innerHeight/2);
+            console.log("Jumping to " + mouseX +"," + mouseY);
+        }
 
-    this.mouseClicked = function(mouseX, mouseY)
-    {
-        gameEngine.mouseClicked(mouseX, mouseY);
 
+        if(this.panOnClick)
+        {
+            gameEngine.panToView(-mouseX, -mouseY);
+            console.log("Panning To:" + mouseX + "," + mouseY);
+
+            //gameEngine.panToView(window.innerWidth/-2, gameEngine.viewY);
+            //return;
+        }
+*/
         if(gameEngine.selectedEntityIdx >= 0)
         {
             gameEngine.entity[gameEngine.selectedEntityIdx].setDest(mouseX, mouseY);
+            gameEngine.entity[gameEngine.selectedEntityIdx].stopAttacking(gameEngine);
+            //var panX = gameEngine.entity[gameEngine.selectedEntityIdx].screenX();
+            //var panY =gameEngine.entity[gameEngine.selectedEntityIdx].screenY();
+            //gameEngine.panToView(panX*-1, panY*-1);
         }
-    }
-}
-
-
-    /*
-    this.loadEntrance = function()
-    {
-        tabs.showTab("tabEntrance");
-    }
-
-    this.resumeLastMap = function()
-    {
-        if(user.currentMapID > 0)
-        {
-            data.dataRequest("map-details", {"mapID":user.currentMapID});
-            data.startAutoRefresh(this.refreshRate);
-        }
-    }
-
-    this.loadCustom = function(gameKey)
-    {
-        if(gameKey == "tutorial-1")
-        {
-            var dataPacket = {"mapName":"Tutorial"
-                            ,"mapSize":10
-                            ,"numAiToAdd":1
-                            ,"allAi": "N"
-                            ,"startingUnits":[
-                                        [{"unitTypeKey":"infantry-1" , "numUnits":"3"}]
-                                        ,[{"unitTypeKey":"infantry-1" , "numUnits":"1"}]
-                                    ]
-                            ,"spawnPoints":[{'tileX':5,'tileY':2},{'tileX':5,'tileY':7}]
-                            ,"debug":false};
-
-            data.dataRequest("setup-game", dataPacket);
-
-            data.startAutoRefresh(this.refreshRate);
-        }
-
-
-        if(gameKey == "custom-1")
-        {
-            var dataPacket = {"mapName":"Easy"
-                            ,"mapSize":10
-                            ,"numAiToAdd":1
-                            ,"startingUnits":[{"unitTypeKey":"factory-1" , "numUnits":"1"}]
-                            ,"spawnPoints":[{'tileX':3,'tileY':2},{'tileX':3,'tileY':8}]
-                            ,"debug":false};
-
-            data.dataRequest("setup-game", dataPacket);
-
-            data.startAutoRefresh(this.refreshRate);
-        }
-
-        if(gameKey == "1v1")
-        {
-            var dataPacket = {"mapName":"1 vs 1"
-                            ,"mapSize":10
-                            ,"numAiToAdd":2
-                            ,"allAi": "Y"
-                            ,"startingUnits":[
-                                        [{"unitTypeKey":"infantry-1" , "numUnits":"1"}]
-                                        ,[{"unitTypeKey":"infantry-1" , "numUnits":"1"}]
-                                    ]
-                            ,"spawnPoints":[{'tileX':3,'tileY':2},{'tileX':3,'tileY':8}]
-                            ,"debug":false};
-
-            data.dataRequest("setup-game", dataPacket);
-
-            data.startAutoRefresh(this.refreshRate);
-        }
-
-
-        if(gameKey == "10v10")
-        {
-            var dataPacket = {"mapName":"10 vs 10"
-                            ,"mapSize":10
-                            ,"numAiToAdd":2
-                            ,"allAi": "Y"
-                            ,"startingUnits":[
-                                        [{"unitTypeKey":"infantry-1" , "numUnits":"9"}]
-                                        ,[{"unitTypeKey":"infantry-1" , "numUnits":"10"}]
-                                    ]
-                            ,"spawnPoints":[{'tileX':5,'tileY':2},{'tileX':5,'tileY':7}]
-                            ,"debug":false};
-
-            data.dataRequest("setup-game", dataPacket);
-
-            data.startAutoRefresh(this.refreshRate);
-        }
-
-
-        if(gameKey == "1range-vs-3combat")
-        {
-            var dataPacket = {"mapName":"Range vs Combat"
-                            ,"mapSize":10
-                            ,"numAiToAdd":2
-                            ,"allAi": "Y"
-                            ,"startingUnits":[
-                                                [{"unitTypeKey":"cannon-1" , "numUnits":"1"}]
-                                                ,[{"unitTypeKey":"infantry-1" , "numUnits":"3"}]
-                                             ]
-                            ,"spawnPoints":[{'tileX':3,'tileY':2},{'tileX':3,'tileY':8}]
-                            ,"debug":false};
-
-            data.dataRequest("setup-game", dataPacket);
-
-            data.startAutoRefresh(this.refreshRate);
-        }
-
-        
-        if(gameKey == "2range-vs-3combat")
-        {
-            var dataPacket = {"mapName":"Range vs Combat"
-                            ,"mapSize":10
-                            ,"numAiToAdd":2
-                            ,"allAi": "Y"
-                            ,"startingUnits":[
-                                                [{"unitTypeKey":"cannon-1" , "numUnits":"2"}]
-                                                ,[{"unitTypeKey":"infantry-1" , "numUnits":"3"}]
-                                             ]
-                            ,"spawnPoints":[{'tileX':3,'tileY':2},{'tileX':3,'tileY':8}]
-                            ,"debug":false};
-
-            data.dataRequest("setup-game", dataPacket);
-
-            data.startAutoRefresh(this.refreshRate);
-        }
-
-
-        if(gameKey == "all-units")
-        {
-            var dataPacket = {"mapName":"All Units"
-                            ,"mapSize":10
-                            ,"numAiToAdd":1
-                            ,"allAi": "N"
-                            ,"startingUnits":[
-                                                [    {"unitTypeKey":"infantry-1" , "numUnits":"1"}
-                                                    ,{"unitTypeKey":"cannon-1" , "numUnits":"1"}]
-
-                                                ,[   {"unitTypeKey":"infantry-1" , "numUnits":"1"}
-                                                     ,{"unitTypeKey":"cannon-1" , "numUnits":"1"}]
-                                             ]
-                            ,"spawnPoints":[{'tileX':3,'tileY':2},{'tileX':3,'tileY':8}]
-                            ,"debug":false};
-
-            data.dataRequest("setup-game", dataPacket);
-
-            data.startAutoRefresh(this.refreshRate);
-        }
-
-
-
 
     }
 
-
-    this.loadEasyMap = function()
+    this.miniMapClicked = function(mouseX, mouseY)
     {
-        var dataPacket = {"mapName":"Easy"
-                            ,"mapSize":10
-                            ,"numAiToAdd":1
-                            ,"startingUnits":"factory-1"
-                            ,"spawnPoints":[{'tileX':3,'tileY':2},{'tileX':3,'tileY':8}]
-                            ,"debug":false};
-
-        data.dataRequest("setup-game", dataPacket);
-
-        data.startAutoRefresh(5000);
-
-    }
-
-    this.dataUpdate = function()
-    {
-        console.log("play.dataUpdate(): " + new Date());
-        data.dataRequest("update-map", {"mapID":user.currentMapID});
-    }
-
-
-    this.incomingData = function(action, dataPacket)
-    {
-        if(action == "setup-game")
-        {
-            console.log("setup-game");
-            user.currentMapID = dataPacket.data.mapID;
-            this.currentMapID = dataPacket.data.mapID;
-            data.dataRequest("map-details", {"mapID":dataPacket.data.mapID});
-        }
-
-        if(action == "train")
-        {        
-            var idx = this.getGameObjectIdx(dataPacket.data.gameObjectID);
-            var action = dataPacket.data.actions;
-            var options = {actionID:action.actionID,"label":action.label, startTime:new Date(), totalTime: action.totalTime};
-
-            this.gameObjs[idx].addAction(options);
-            
-        }
-
-
-        if(action == "move")
-        {        
-            var idx = this.getGameObjectIdx(dataPacket.data.gameObjectID);
-            var action = dataPacket.data.actions;
-            var options = {actionID:action.actionID,"label":action.label, startTime:new Date(), totalTime: action.totalTime};
-
-            this.gameObjs[idx].addAction(options);
-            
-        }
-
-
-
-        if(action == "get-obj-options")
-        {
-            var options = [];
-
-            for(var i=0;i<dataPacket.data.buildables.length;i++)
-            {
-                var build = dataPacket.data.buildables[i];
-                var action = {"label":build.label + " - " + build.buildTime + " seconds"
-                                ,action:"play.train(" + dataPacket.data.gameObjectID + ",'" + build.unitTypeKey + "', " + build.buildTime + ");gui.closeAllPopups();"
-                            };
-                options.push(action);
-            }
-                
-            gui.popButtonMenu(options);
-        }
-
-
-        if(action == "map-details" || action == "update-map")
-        {
-            
-            //console.log("map-details:", dataPacket.data);
-            if(this.mapID != dataPacket.data.map.mapID)
-            {
-                this.loadMap(dataPacket);
-            }
-            else
-            {
-                this.syncMap(dataPacket);
-            }
-
-        }
-    }
-
-    this.syncMap = function(dataPacket)
-    {
-        for(var i=0;i<dataPacket.data.gameObj.length;i++)
-        {
-           var obj = dataPacket.data.gameObj[i];
-
-           var idx = this.getGameObjectIdx(obj.gameObjectID);
-
-           if(idx >= 0)
-           {
-               this.gameObjs[idx].pos = new Position({tileX:obj.tileX, tileY:obj.tileY});
-               this.gameObjs[idx].data = obj;
-           }
-           else
-           {
-
-                var g = new GameObj();
-                g.ownerID = obj.ownerID;
-                g.pos = new Position({tileX:obj.tileX, tileY:obj.tileY});
-                var imgKey = obj.imgKey;
-                if(obj.ownerID == user.userID) imgKey+="-1-friendly";
-                if(obj.ownerID != user.userID) imgKey+="-1-enemy";
-                g.imgKey =  imgKey;
-                g.data  = obj;
-
-                this.gameObjs.push(g);
-           }
-   
-        }
-
-
-        for(var i=0;i<dataPacket.data.actions.length;i++)
-        {
-            var action = dataPacket.data.actions[i];
-
-            var idx = this.getGameObjectIdx(action.gameObjectID);
-
-            var t = action.startTime.split(/[- :]/);
-            var startTime = new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5]));
-        
-            var options = {actionID:action.actionID,"label":action.label, startTime:new Date(), totalTime: action.totalTime};
-
-            this.gameObjs[idx].addAction(options);
-
-        }
-    }
-
-
-
-    this.loadMap = function(dataPacket)
-    {
-        this.resetGame();
-
-        gui.loadTileConfig(dataPacket.data.tileConfig);
-        this.tilesLoaded = true;
-        
-        this.mapID = dataPacket.data.map.mapID;                
-        gui.debug("play.loadMap(): mapID:" + this.mapID);
-        
-        gameMap = "";
-
-        var map = dataPacket.data.map;
-
-        gameMap = new Map({canvasID:"mainGameCanvas",mapWidth:map.mapSize * this.tileSize,mapHeight:map.mapSize * this.tileSize,debug:true});
-        gameMap.tileSize = this.tileSize;
-        gui.setLoadingMsg("loading tilies...");
-        gameMap.loadTiles(dataPacket.data.tileConfig);
-
-        gameMap.clearTileMap();
-        gameMap.mapID = this.currentMapID;
-
-
-        
-        for(var i=0;i<dataPacket.data.players.length;i++)
-        {
-            if(dataPacket.data.players[i].userID == user.userID)
-            {
-                //user.data.gold = dataPacket.data.players[i].gold;
-                //gui.updateStat("hudGold",user.data.gold);
-            }
-        }
-
-
-        for(var i=0;i<dataPacket.data.mapObjects.length;i++)
-        {
-            //gui.setLoadingMsg("adding tile " + i);
-            gameMap.setTile(dataPacket.data.mapObjects[i].imgKey, dataPacket.data.mapObjects[i].tileX, dataPacket.data.mapObjects[i].tileY);
-
-        }
-
-                        
-        for(var i=0;i<dataPacket.data.gameObj.length;i++)
-        {
-            var obj = dataPacket.data.gameObj[i];
-
-            var g = new GameObj();
-            g.ownerID = obj.ownerID;
-            g.pos = new Position({tileX:obj.tileX, tileY:obj.tileY});
-            var imgKey = obj.imgKey;
-            if(obj.ownerID == user.userID) imgKey+="-1-friendly";
-            if(obj.ownerID != user.userID) imgKey+="-1-enemy";
-            g.imgKey =  imgKey;
-            g.data  = obj;
-            
-            this.gameObjs.push(g);
-    
-        }
-
-
-                
-        gui.setLoadingMsg("creating map...");
-        
-        this.playing = true;
-        gameClient = new GameClient({canvasID:"mainGameCanvas"});
-        gameClient.initialize({canvasID:"mainGameCanvas"});
-        gameClient.startRendering();
-
-        this.updateInterval = setInterval(this.update, 3000);
-
-        gui.showGameCanvas();
-
-        gui.showHud();
-
-        this.processDataRequests = true;
-
-        gui.closeAllPopups();
-
-        tabs.showTab("tabGameCanvas");
-
-        this.playing = true;
-    }
-
-    this.resetGame = function()
-    {
-        this.gameObjs = [];
-        this.selectedGameObjectIdx = -1;
-        this.currentAction = {};
-        this.playing = false;
-    }
-
-
-
-    this.render = function(context)
-    {
-        if(!this.playing) return;
-
-        for(var i=0;i<this.gameObjs.length;i++)
-        {
-            this.gameObjs[i].render(context, this.tileSize);
-
-            if(i == this.selectedGameObjectIdx)
-            {
-                context.strokeStyle = "yellow";
-                context.strokeRect(this.gameObjs[i].pos.x, this.gameObjs[i].pos.y, this.tileSize, this.tileSize);
-            }
-        }
-
-        if(this.selectedGameObjectIdx >= 0)
-        {
-            var drawX = window.innerWidth - 160;
-            var drawY = 10;
-            context.strokeStyle = "white";
-            context.fillStyle = "white";
-            context.strokeRect(drawX, drawY, 130,100);
-            
-            var u = this.gameObjs[this.selectedGameObjectIdx];
-            
- 
-            context.fillText(u.data.imgKey, drawX + 5, drawY+=15);
-            context.fillText("Life", drawX + 5, drawY+=15);
-            context.fillText("Range", drawX + 5, drawY+=15);
-            context.fillText("Move Speed", drawX + 5, drawY+=15);
-            context.fillText("Att Speed", drawX + 5, drawY+=15);
-            context.fillText("Damage", drawX + 5, drawY+=15);
-            
-            drawX = window.innerWidth - 160;
-            drawY = 35;
-            this.drawBoxStat(context, u.data.maxLife - u.data.damageTaken, drawX + 75, drawY);
-            this.drawBoxStat(context, u.data.attackRange, drawX + 75, drawY + 12);
-            this.drawBoxStat(context, u.data.movementSpeed, drawX + 75, drawY + 30);
-            this.drawBoxStat(context, u.data.attackSpeed, drawX + 75, drawY + 45);
-            this.drawBoxStat(context, u.data.attackDamage, drawX + 75, drawY + 60);
-        }
-
-        this.roundCheck();
-    }
-
-    this.drawBoxStat = function(context, val, drawX, drawY)
-    {
-        var boxSize = 5;
-        
-        for(var i=0;i<val;i++)
-        {
-            context.fillStyle = "white";
-            context.fillRect(drawX + (i*boxSize), drawY, boxSize, boxSize);
-            drawX+=2;
-        }
-    }
-
-    this.roundCheck = function()
-    {
-        return;
-        var objs = [];
-        var numEnemyUnits = 0;
-        var numFriendlyUnits = 0;
-        var activeUsers = [];
-
-        for(var i=0;i<this.gameObjs.length;i++)
-        {
-            if(this.gameObjs[i].isAlive())
-            {
-                objs.push(this.gameObjs[i]);
-
-                if(!activeUsers.includes(this.gameObjs[i].ownerID))
-                {
-                    activeUsers.push(this.gameObjs[i].ownerID);
-                }
-
-                if(this.gameObjs[i].ownerID == user.userID)
-                {
-                    numFriendlyUnits++;
-                }
-                else
-                {
-                    numEnemyUnits++;
-                }
-            }
-        }
-
-        this.gameObjs = objs;
-
-        if(activeUsers.length > 1)
-        {
-            return; //keep playing
-        }
-
-
-        if(numEnemyUnits <= 0)
-        {
-            this.playing = false;
-            tabs.showTab("tabVictory");
-        }
-
-        if(numFriendlyUnits <= 0)
-        {
-            this.playing = false;
-            tabs.showTab("tabDefeat");
-        }
+        gameEngine.miniMapClicked(mouseX, mouseY);
     }
     
-    this.emptyAreaClicked = function(mouseX, mouseY)
-    {
-        user.userTookAction();
-        
-        var clickedPos = new Position({x:mouseX, y:mouseY});
-        console.log("emptyAreaClicked(" + mouseX + "," + mouseY +"): tile:" + clickedPos.tileX + "," + clickedPos.tileY);
-        var clickedOnEmpty = true;
+    this.mouseMoveEnd  = function(mouseX, mouseY){}
 
-        for(var i=0;i<this.gameObjs.length;i++)
-        {
-            if(this.gameObjs[i].pos.tileX == clickedPos.tileX && this.gameObjs[i].pos.tileY == clickedPos.tileY)
-            {
-                clickedOnEmpty = false;
-                
-                gui.debug("Game Obj " + i + " clicked");
-                this.gameObjs[i].clicked();
-                //this.selectKingdom(i);
-            }
-        
-        }
-
-        if(clickedOnEmpty)
-        {
-            if(this.selectedGameObjectIdx >= 0)
-            {
-                var u = this.gameObjs[this.selectedGameObjectIdx];
-
-                if(u.actions.length <= 0 && u.ownerID == user.userID)
-                {
-                    var d = this.getDistance(u.pos.tileX, u.pos.tileY, clickedPos.tileX, clickedPos.tileY);
-                    var secs = d * u.data.movementSpeed;
-                    var html = Math.ceil(d) + " klicks " + Math.ceil(secs) + " seconds";
-
-                    play.popPanel("panel-div-panel-mini",html);
-
-                    this.currentAction = {"action":"move", gameObjectID:u.data.gameObjectID, destX:clickedPos.tileX, destY:clickedPos.tileY, startTime:new Date(), totalTime: secs};
-                }
-            }
-
-            gui.closeAllPopups();
-        }
-
-
-    }
-
-    this.confirmAction = function()
-    {
-        //TODO send action to server
-        
-        if(this.currentAction.action == "move")
-        {
-
-
-            var dataPacket = {"gameObjectID":this.currentAction.gameObjectID,"tileX":this.currentAction.destX,"tileY":this.currentAction.destY};
-        
-            data.dataRequest("move", dataPacket);
-
-            this.selectedGameObjectIdx = -1;
-            
-            document.getElementById("panel-div-panel-mini").style.visibility = "hidden";
-        }
-
-        if(this.currentAction.action == "attack")
-        {
-            var idx = this.getGameObjectIdx(this.currentAction.gameObjectID);
-
-            var attacker = this.gameObjs[this.selectedGameObjectIdx];
-
-            var dataPacket = { attackerGameObjectID: attacker.data.gameObjectID, defenderGameObjectID:this.currentAction.defenderGameObjectId};
-            data.dataRequest("attack", dataPacket);
-            
-            this.selectedGameObjectIdx = -1;
-            document.getElementById("panel-div-panel-mini").style.visibility = "hidden";
-        }
-    }
-
-    this.popPanel = function(panelID, html)
-    {
-        var d = document.getElementById(panelID);
-        d.style.top = "10px";
-        d.style.left = "10px";
-        d.style.visibility = "visible";
-        document.getElementById(panelID + "-contents").innerHTML = html;
-    }
-
-    this.nextActionID = 1;
-    this.train = function(trainingGameObjectID, unitTypeKey, trainingTime)
-    {
-        var dataPacket = {"gameObjectID":trainingGameObjectID,"unitTypeKey":unitTypeKey};
-        
-        data.dataRequest("train", dataPacket);
-    }
-
-
-
-    this.setSelectedGameObj = function(gameObjectID)
-    {
-        this.selectedGameObjectIdx = this.getGameObjectIdx(gameObjectID);
-        gui.debug("Game Object Selected: " + this.selectedGameObjectIdx);
-    }
-
-    this.getGameObjectIdx = function(id)
-    {
-        for(var i=0;i<this.gameObjs.length;i++)
-        {
-            if(this.gameObjs[i].data.gameObjectID == id || this.gameObjs[i].data.gameObjectID == id)
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    this.getDistance = function(x1,y1, x2, y2)
-    {
-        var a = x1 - x2
-        var b = y1 - y2
-        
-        return Math.sqrt( a*a + b*b );    
-    }
-
-
+    this.mouseClicked = function(mouseX, mouseY){gameEngine.mouseClicked(mouseX, mouseY);}
 }
 
-
-*/

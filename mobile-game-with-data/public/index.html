@@ -15,6 +15,7 @@
         <link rel="stylesheet" href="css/game-gui.css"/>
 
         <script src="js/lib/jquery.min.js" type="text/javascript"></script>
+        <script src="js/lib/socket.io.js" type="text/javascript"></script>
         <script src="js/gui.class.js" type="text/javascript"></script>
         <script src="js/assets.class.js" type="text/javascript"></script>
         <script src="js/bind-inputs.js" type="text/javascript"></script>
@@ -25,7 +26,7 @@
         <script src="js/engine/position.class.js" type="text/javascript"></script>
         
 
-        <script src="js/games/client-side-game-only.class.js" type="text/javascript"></script>
+        <script src="js/games/data-driven-game.js" type="text/javascript"></script>
         
 
     </head>
@@ -125,13 +126,7 @@
 
             <P><button onclick="play.loadGame(); play.loadTileMap()">Load TileMap</button>
 
-            <P><button onclick="play.loadGame(); play.loadFightSample()">Load Fight</button>
 
-            <P><button onclick="play.loadGame(); play.loadPanningTest()">Load Panning Test</button>
-
-            <P><button onclick="play.loadGame(); play.loadMiniMapTest()">Load MiniMap Test</button>
-
-                
 
 
         </div>
@@ -197,7 +192,7 @@
 
                 //setTimeout("gui.showView('viewEntrance')",1000);
 
-                setTimeout("gui.showView('viewEntrance'),play.loadGame();",1000);
+                setTimeout("play.loadGame();",1000);
                 
             }
 

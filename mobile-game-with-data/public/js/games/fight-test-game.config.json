@@ -1,0 +1,13 @@
+{
+    "startingChar": {"life": 5000, "startX": 200, "startY": 200}
+    ,"numEnemies": 10
+    ,"spawnArea": [{"x":200,"y":200}]
+    
+    ,"enemyProfiles": [
+                    {"life":5000, "level": 50}
+    ]
+
+    ,"assets": []    
+    ,"tileMaps": []
+    ,"build": []
+}

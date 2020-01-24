@@ -1,15 +1,3 @@
-var debugBindInputs = false;
-
-var xUp = null;
-var yUp = null;
-var xDown = null;                                                        
-var yDown = null;                                                        
-var xDiff = null;
-var yDiff = null;
-
-document.addEventListener('touchstart', handleTouchStart, false);        
-document.addEventListener('touchmove', handleTouchMove, false);
-document.addEventListener('touchend', handleTouchEnd, false);
 
 function canvasClicked(evt) 
 {
@@ -45,17 +33,27 @@ function canvasMouseMoved(evt)
       
 
 
+
+
+document.addEventListener('touchstart', handleTouchStart, false);        
+document.addEventListener('touchmove', handleTouchMove, false);
+document.addEventListener('touchend', handleTouchEnd, false);
+
+var xUp = null;
+var yUp = null;
+var xDown = null;                                                        
+var yDown = null;                                                        
+var xDiff = null;
+var yDiff = null;
+
 function handleTouchStart(evt) 
 {      
   var p = translateToScale(evt.touches[0].clientX,evt.touches[0].clientY);
   xDown = p.x;
   yDown = p.y;
-  if(debugBindInputs)
-  {
-    console.log("Touch Start: " + xDown + "," + yDown);
-    console.log("Touch Client:" + evt.touches[0].clientX + "," + evt.touches[0].clientY)
-    console.log("Touch Screen:" + evt.touches[0].screenX + "," + evt.touches[0].screenY)
-  };
+  console.log("Touch Start: " + xDown + "," + yDown);
+  console.log("Touch Client:" + evt.touches[0].clientX + "," + evt.touches[0].clientY)
+  console.log("Touch Screen:" + evt.touches[0].screenX + "," + evt.touches[0].screenY)
   play.mouseClicked(xDown, yDown);
   
 }; 
